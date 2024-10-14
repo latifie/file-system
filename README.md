@@ -1,5 +1,40 @@
 # file-system
 
+## Arborescence de notre Système de fichier 
+file_system/
+├── include/                          # Dossier pour les fichiers d'en-tête
+│   ├── fs_simple.h                   
+│   ├── superblock.h                  
+│   ├── inode.h                       
+│   ├── block.h                       
+│   ├── bitmap.h                      
+│   └── constants.h                   # Constantes supplémentaires (ex : tailles de fichiers)
+│
+├── src/                              
+│   ├── superblock.c                  
+│   ├── inode.c                       
+│   ├── block.c                       
+│   ├── bitmap.c                      
+│   ├── filesystem.c                  # Fonctions pour le formatage et montage du FS
+│   ├── directory.c                   # Fonctions pour la gestion des répertoires
+│   └── file_ops.c                    # Fonctions pour les opérations sur les fichiers
+│
+├── tests/                            # Dossier pour les tests unitaires
+│   ├── test_superblock.c             
+│   ├── test_inode.c                  
+│   ├── test_bitmap.c                 
+│   ├── test_block.c                  
+│   └── test_filesystem.c             # Teste les opérations globales du FS (formatage, montage)
+│
+├── tools/                            # Dossier pour les outils utilitaires
+│   ├── mkfs_simple.c                 
+│   └── fsck_simple.c                 
+│
+├── EXPLICATION.md                    
+├── .gitignore                        # Fichier gitignore pour exclure certains fichiers
+└── README.md                         # Fichier README pour décrire le projet
+
+
 ## EXT2 est basé sur plusieurs concepts clés :
 
 Superblock : Contient des informations essentielles sur le système de fichiers, comme la taille, le nombre de blocs, le nombre d'inodes, etc.
