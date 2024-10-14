@@ -1,6 +1,7 @@
 # file-system
 
 ## Arborescence de notre Système de fichier 
+```
 file_system/
 ├── include/                          # Dossier pour les fichiers d'en-tête
 │   ├── fs_simple.h                   
@@ -33,6 +34,7 @@ file_system/
 ├── EXPLICATION.md                    
 ├── .gitignore                        # Fichier gitignore pour exclure certains fichiers
 └── README.md                         # Fichier README pour décrire le projet
+```
 
 
 ## EXT2 est basé sur plusieurs concepts clés :
