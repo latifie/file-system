@@ -2,8 +2,8 @@
 
 static char error_buffer[256];
 
-char* fs_get_error(void) {
-    return error_buffer;
+const char* fs_get_error(void) {
+    return "No error";
 }
 
 static int split_path(const char* path, char* dir, char* name) {
@@ -189,7 +189,7 @@ int fs_write(filesystem* fs, const char* path, const char* data, int size) {
 
     if (size > BLOCK_SIZE) size = BLOCK_SIZE; // Simplify block allocation
     file->start_block = 0;
-    file->num_blocks = 1;
+    file->num_block = 1;
     memcpy(fs->blocks[0], data, size);
     file->size = size;
     file->modified = time(NULL);
@@ -220,6 +220,41 @@ int fs_export(filesystem* fs, const char* virtual_path, const char* real_path) {
     return 0;
 }
 
+int fs_read(filesystem* fs, const char* path, char* buffer, size_t size) {
+    // Locate the inode for the given path
+    int inode_index = fs_find_file_by_path(fs, path);
+    if (inode_index < 0) {
+        return -1; // File not found
+    }
+
+    inode* file_inode = &fs->inodes[inode_index];
+    if (!file_inode->is_file) {
+        return -1; // Not a file
+    }
+
+    // Read data from file blocks into the buffer
+    size_t bytes_read = 0;
+    for (int i = 0; i < NUM_BLOCK && bytes_read < size && bytes_read < file_inode->size; i++) {
+        if (file_inode->blocks[i] == 0) {
+            break; // No more data blocks
+        }
+        
+        // Calculate how much data to read
+        size_t to_read = file_inode->size - bytes_read;
+        if (to_read > BLOCK_SIZE) {
+            to_read = BLOCK_SIZE;
+        }
+        
+        // Seek to the block and read data
+        fseek(fs->disk, file_inode->blocks[i] * BLOCK_SIZE, SEEK_SET);
+        fread(buffer + bytes_read, 1, to_read, fs->disk);
+
+        bytes_read += to_read;
+    }
+
+    buffer[bytes_read] = '\0'; // Null-terminate the buffer
+    return 0; // Success
+}
 
 int fs_list_directory(filesystem* fs, const char* path) {
     for (int i = 0; i < MAX_FILES; i++) {
