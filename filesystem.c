@@ -242,4 +242,32 @@ int fs_chmod(filesystem* fs, const char* path, mode_t mode) {
 
     return 0;
 }
+int fs_find_file_by_path(filesystem* fs, const char* path) {
+    char dir[MAX_PATH];
+    char name[MAX_FILENAME];
+    split_path(path, dir, name);
 
+    // Si c'est un chemin racine
+    if (strcmp(dir, "/") == 0) {
+        // Chercher le fichier dans le système de fichiers
+        for (int i = 0; i < MAX_FILES; i++) {
+            if (fs->file_table[i].in_use && strcmp(fs->file_table[i].filename, name) == 0) {
+                return i;  // Trouvé, retourner l'index
+            }
+        }
+    } else {
+        // Si ce n'est pas dans la racine, effectuer la recherche dans le sous-dossier
+        for (int i = 0; i < MAX_FILES; i++) {
+            if (fs->file_table[i].in_use && strcmp(fs->file_table[i].filename, dir) == 0) {
+                // Chercher dans ce répertoire
+                for (int j = 0; j < MAX_FILES; j++) {
+                    if (fs->file_table[j].in_use && strcmp(fs->file_table[j].filename, name) == 0) {
+                        return j;
+                    }
+                }
+            }
+        }
+    }
+
+    return -1;  // Si non trouvé
+}
