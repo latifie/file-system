@@ -59,10 +59,12 @@ int fs_read(filesystem* fs, const char* path, char* buffer, int size);
 int fs_list_directory(filesystem* fs, const char* path);
 int fs_chmod(filesystem* fs, const char* path, mode_t mode);
 
+// New public function to find file by path
+int fs_find_file_by_path(filesystem* fs, const char* path);
+
 int fs_defrag(filesystem* fs);
 char* fs_get_error(void);
 
 int fs_export(filesystem* fs, const char* virtual_path, const char* real_path);
 
 #endif
-
