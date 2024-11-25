@@ -1,9 +1,44 @@
 #include "filesystem.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "filesystem.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Function to recursively create parent directories
+int create_parent_directories(filesystem* fs, const char* path) {
+    char dir[MAX_PATH];
+    char* last_slash = strrchr(path, '/');
+    
+    // If no slash or root directory, no parent to create
+    if (!last_slash || last_slash == path) return 0;
+
+    strncpy(dir, path, last_slash - path);
+    dir[last_slash - path] = '\0';
+
+    // If directory already exists, return
+    int existing = fs_find_file_by_path(fs, dir);
+    if (existing != -1) return 0;
+
+    // Recursively create parent directories
+    create_parent_directories(fs, dir);
+
+    // Create this directory
+    if (fs_create_directory(fs, dir) != 0) {
+        printf("Failed to create directory: %s\n", dir);
+        return -1;
+    }
+
+    return 0;
+}
+
+// (Rest of the main.c remains the same as in previous version)
 
 int main() {
-    // Charger ou créer le système de fichiers
+    // Load or create the filesystem
     filesystem* fs = fs_load("myfs.dat");
     if (!fs) {
         printf("Creating new filesystem...\n");
@@ -29,6 +64,13 @@ int main() {
     printf("Enter the content of the file: ");
     getchar(); // Consume the newline character from previous input
     fgets(content, sizeof(content), stdin);
+
+    // Create parent directories
+    if (create_parent_directories(fs, filename) != 0) {
+        printf("Failed to create parent directories\n");
+        fs_destroy(fs);
+        return 1;
+    }
 
     // Créer le fichier
     if (fs_create_file(fs, filename) != 0) {
@@ -69,4 +111,3 @@ int main() {
     fs_destroy(fs);
     return 0;
 }
-
